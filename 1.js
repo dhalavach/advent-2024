@@ -4,6 +4,7 @@ async function solve(pathToInput) {
   const data = await fs.readFile(pathToInput, 'utf-8');
 
   const regex = /(\d+)\s+(\d+)/g;
+  
 
   const firstNumbers = [];
   const secondNumbers = [];
