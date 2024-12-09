@@ -1,14 +1,12 @@
-// import { sumUpArray } from '../../../utils/utils';
 import * as fs from 'fs';
 
 function sumArray(arr) {
-  const result = arr.reduce((a, b) => a + b, 0);
-  return result;
+  return arr.reduce((a, b) => a + b, 0);
 }
 
 const input = fs.readFileSync('input-9.txt', 'utf-8');
 
-export class InputParser {
+class InputParser {
   input;
   indexCounter;
   inputMap;
@@ -24,9 +22,13 @@ export class InputParser {
     const arr = string
       .replace(/\r/g, '')
       .split('')
-      .map((element) => parseInt(element));
+      .map((element) => {
+        const num = parseInt(element, 10);
+        return isNaN(num) ? 0 : num; // Replace invalid values with 0 or handle appropriately
+      });
+
     for (let i = 0; i < arr.length; i++) {
-      if (i % 2 != 0) {
+      if (i % 2 !== 0) {
         this.inputMap.set(i, new Array(arr[i]).fill('.'));
       } else {
         this.inputMap.set(i, new Array(arr[i]).fill(this.indexCounter));
@@ -37,44 +39,62 @@ export class InputParser {
   }
 
   #turnInputIntoString() {
-    return fs.readFileSync(this.input).toString('utf-8');
+    return this.input; // Return the content of the file
   }
 }
+class Defragmentor {
+  map;
+  fileSystem;
+  emptySpaces;
+  mapSize;
 
-///////////////////////////
-
-export class Defragmentor {
   constructor(map) {
     this.map = map;
+    this.fileSystem = [];
+    this.emptySpaces = 0;
+    this.mapSize = map.size;
   }
 
   createAndDefragment() {
-    const fileSystem = this.#populateFileSystem();
-    const defragmentedFileSystem = this.#defragmentFileSystem(fileSystem);
-    return this.#computeResult(defragmentedFileSystem);
+    this.#createFilesystem();
+    this.#defragment();
+    return this.#calculateResult();
   }
 
-  #populateFileSystem() {
-    // Flatten the map values into a single array
-    return Array.from(this.map.values()).flat();
+  #createFilesystem() {
+    for (let i = 0; i < this.map.size; i++) {
+      this.map.get(i).forEach((element) => {
+        this.fileSystem.push(element);
+      });
+    }
   }
 
-  #defragmentFileSystem(fileSystem) {
-    // Collect numbers and count empty spaces ('.')
-    const numbers = fileSystem.filter((item) => typeof item === 'number');
-    const emptySpacesCount = fileSystem.length - numbers.length;
-
-    // Reconstruct the defragmented file system
-    return [...numbers, ...Array(emptySpacesCount).fill('.')];
+  #defragment() {
+    for (let i = 0; i < this.fileSystem.length; i++) {
+      if (this.fileSystem[i] === '.') {
+        for (let k = this.fileSystem.length - 1; k > i; k--) {
+          if (typeof this.fileSystem[k] === 'number') {
+            this.fileSystem[i] = this.fileSystem[k];
+            this.fileSystem[k] = '.';
+            break;
+          }
+        }
+      }
+    }
   }
 
-  #computeResult(fileSystem) {
-    // Map and reduce to compute the final result
-    return fileSystem.reduce((acc, item, index) => (typeof item === 'number' ? acc + index * item : acc), 0);
+  #calculateResult() {
+    const resultArr = [];
+    for (let i = 0; i < this.fileSystem.length; i++) {
+      if (typeof this.fileSystem[i] === 'number') {
+        resultArr.push(i * Number(this.fileSystem[i]));
+      }
+    }
+    return sumArray(resultArr);
   }
 }
 
-const parser = new InputParser('./input-9.txt');
+const parser = new InputParser();
 const parsedInput = parser.createInputMap();
 const defrag = new Defragmentor(parsedInput);
 
