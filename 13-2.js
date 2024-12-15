@@ -20,7 +20,7 @@ function parseInput(input) {
 const parsedData = parseInput(input);
 
 function getMinimalCost(targetX, targetY, buttonA, buttonB) {
-  const tolerance = 0.0001;
+  const tolerance = 0.000001;
   let total = 0;
   const A =
     (buttonB.vector.x * targetY - buttonB.vector.y * targetX) /
