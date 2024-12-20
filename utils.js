@@ -17,3 +17,20 @@ export async function readInput(relativePathToInput) {
 
   return input;
 }
+
+export async function findInitialPlayerPosition(grid, playerChar) {
+  if (!grid || !playerChar) throw new TypeError('Missing arguments');
+
+  let startX = 0;
+  let startY = 0;
+  for (let j = 0; j < grid.length; j++) {
+    for (let i = 0; i < grid[j].length; i++) {
+      if (grid[j][i] === playerChar) {
+        startX = j;
+        startY = i;
+        break;
+      }
+    }
+  }
+  return [startX, startY];
+}
