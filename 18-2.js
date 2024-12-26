@@ -8,9 +8,6 @@ const coordinates = fs
   .split('\n')
   .map((line) => line.split(',').map(Number));
 
-let low = 0;
-let high = coordinates.length - 1;
-
 function checkIfPathExists(coordinates, n) {
   const grid = Array.from({ length: s + 1 }, () => Array(s + 1).fill(0));
 
@@ -40,7 +37,18 @@ function checkIfPathExists(coordinates, n) {
   return false;
 }
 
-while (checkIfPathExists(coordinates, n)) {
-  n++;
+let left = 0;
+let right = coordinates.length - 1;
+
+while (left < right) {
+  let mid = Math.floor((left + right) / 2);
+  //console.log(mid);
+
+  if (checkIfPathExists(coordinates, mid + 1)) {
+    left = mid + 1;
+  } else {
+    right = mid;
+  }
 }
-console.log(coordinates[n - 1]);
+
+console.log(coordinates[left]);
