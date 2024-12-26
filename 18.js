@@ -1,38 +1,25 @@
-import { readInput, create2DArray } from './utils.js';
-import { Deque } from './collections.js';
-
-const width = 70;
-const height = 70;
+import fs from 'fs';
 const s = 70;
+const n = 1024;
 
-const input = await readInput('./input-18.txt');
-const data = input.split('\n').map((el) => {
-  let matches = el.match(/(\d+)/g);
-  return [parseInt(matches[0]), parseInt(matches[1])];
+const grid = Array.from({ length: s + 1 }, () => Array(s + 1).fill(0));
+
+const coordinates = fs
+  .readFileSync('input-18.txt', 'utf-8')
+  .trim()
+  .split('\n')
+  .map((line) => line.split(',').map(Number));
+
+coordinates.slice(0, n).forEach(([c, r]) => {
+  grid[r][c] = 1;
 });
 
-function checkIfCoordinatesInArray(x, y, array) {
-  function equalToXY(arr) {
-    return arr[0] === x && arr[1] === y;
-  }
-  return array.some(equalToXY);
-}
+const q = [[0, 0, 0]];
+const visited = new Set(['0,0']);
 
-const grid = create2DArray(71, 71);
-data.forEach((el) => (grid[el[0]][el[1]] = 1));
+while (q.length > 0) {
+  const [r, c, d] = q.shift();
 
-const visited = new Set();
-visited.add('0,0');
-
-const dq = new Deque();
-dq.addFront([0, 0, 0]);
-while (dq.peekFront()) {
-  console.log('while loop running..');
-  let q = dq.removeFront();
-  console.log(q);
-  let r = q[0];
-  let c = q[1];
-  let d = q[2];
   for (const [nr, nc] of [
     [r + 1, c],
     [r, c + 1],
@@ -42,16 +29,13 @@ while (dq.peekFront()) {
     if (nr < 0 || nc < 0 || nr > s || nc > s) continue;
     if (grid[nr][nc] === 1) continue;
     if (visited.has(`${nr},${nc}`)) continue;
-    if (nr === nc && nr === s) {
+
+    if (nr === s && nc === s) {
       console.log(d + 1);
       break;
-    } else {
-      visited.add(`${nr},${nc}`);
-      dq.addFront([nr, nc, d + 1]);
     }
+
+    visited.add(`${nr},${nc}`);
+    q.push([nr, nc, d + 1]);
   }
 }
-
-// console.log(data);
-
-// console.log(checkIfCoordinatesInArray(19, 47, data));
